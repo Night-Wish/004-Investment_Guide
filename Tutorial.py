@@ -73,6 +73,7 @@ class Login(QtWidgets.QWidget):
 if __name__ == '__main__':
 #Qt，同C++，要求程序必须有一个main函数，这也是这个代码块存在的意义
 #为什么这样表述，我也不清楚
+#通常main函数会单独放在一个文件里，而不会放在某个类下面，这里仅仅只是为了让你们能运行代码看到实例将这一部分写在类下面
     app=QtWidgets.QApplication(sys.argv)
 #这里需要创建一个QApplication实例，是所有Qt程序必须有的一步，其来源于QtCore
     login=Login()
