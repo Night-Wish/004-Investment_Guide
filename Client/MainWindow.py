@@ -25,4 +25,4 @@ class MainWindow(QtWidgets.QMainWindow):
             self.stockBrowser=StockBrowser.StockBrowser()
             self.login.close()
             self.setCentralWidget(self.stockBrowser)
-            self.resize(800,400)
+            self.resize(1000,500)
