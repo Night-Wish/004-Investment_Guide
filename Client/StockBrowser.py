@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets,QtCore,QtGui
+from PyQt5 import QtWidgets
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import tushare as ts
@@ -11,6 +11,7 @@ class StockBrowser(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
         self.arrangeUI()
+        self.fillStockList()
     
     def initUI(self):
         self.searchLineEdit=SearchLineEdit.SearchLineEdit()
@@ -45,3 +46,8 @@ class StockBrowser(QtWidgets.QWidget):
         canvas=FigureCanvas(figure)
         canvas.draw()
         return canvas
+    
+    def fillStockList(self):
+        stockList=np.loadtxt('industry.txt',str,delimiter=',')
+        for stock in stockList:
+            self.stockList.addItem(stock[0]+'\t'+stock[1]+'\t'+stock[2])
