@@ -1,8 +1,10 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets,QtCore,QtGui
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import tushare as ts
 import numpy as np
+import SearchLineEdit
+
 class StockBrowser(QtWidgets.QWidget):
     
     def __init__(self,parent=None):
@@ -11,7 +13,7 @@ class StockBrowser(QtWidgets.QWidget):
         self.arrangeUI()
     
     def initUI(self):
-        self.searchLineEdit=QtWidgets.QLineEdit()
+        self.searchLineEdit=SearchLineEdit.SearchLineEdit()
         self.stockList=QtWidgets.QListWidget()
         self.stockPriceGraph=self.plotRandomStock()
         
