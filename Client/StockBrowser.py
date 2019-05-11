@@ -8,6 +8,7 @@ class StockBrowser(QtWidgets.QWidget):
     def __init__(self,parent=None):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
+        self.arrangeUI()
     
     def initUI(self):
         self.searchLineEdit=QtWidgets.QLineEdit()
@@ -15,15 +16,21 @@ class StockBrowser(QtWidgets.QWidget):
         self.stockPriceGraph=self.plotRandomStock()
         
         self.leftLayout=QtWidgets.QVBoxLayout()
+        
+        self.middleLayout=QtWidgets.QVBoxLayout()
+        
+        self.mainLayout=QtWidgets.QHBoxLayout(self)
+        
+    def arrangeUI(self):
         self.leftLayout.addWidget(self.searchLineEdit)
         self.leftLayout.addWidget(self.stockList)
         
-        self.middleLayout=QtWidgets.QVBoxLayout()
         self.middleLayout.addWidget(self.stockPriceGraph)
         
-        self.mainLayout=QtWidgets.QHBoxLayout(self)
         self.mainLayout.addLayout(self.leftLayout)
         self.mainLayout.addLayout(self.middleLayout)
+        self.mainLayout.setStretchFactor(self.leftLayout,3)
+        self.mainLayout.setStretchFactor(self.middleLayout,7)
         
     def plotRandomStock(self):
         self.stockCode='002230'
