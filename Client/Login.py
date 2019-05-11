@@ -23,3 +23,5 @@ class Login(QtWidgets.QWidget):
         self.mainLayout.addWidget(self.rememberCheckBox,2,0)
         self.mainLayout.addWidget(self.autoLogCheckBox,2,1)
         self.mainLayout.addWidget(self.loginPushBtn,2,2)
+        
+        self.setWindowTitle("Login")

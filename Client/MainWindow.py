@@ -1,4 +1,5 @@
 import Login
+import StockBrowser
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 
