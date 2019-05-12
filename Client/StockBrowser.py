@@ -14,7 +14,7 @@ class StockBrowser(QtWidgets.QWidget):
     def initUI(self):
         self.searchLineEdit=SearchLineEdit.SearchLineEdit()
         self.stockList=QtWidgets.QListWidget()
-        self.stockGraph=pg.PlotWidget(self)
+        self.stockGraph=pg.PlotWidget()
         
         self.leftLayout=QtWidgets.QVBoxLayout()
         self.leftLayout.addWidget(self.searchLineEdit)
@@ -40,13 +40,12 @@ class StockBrowser(QtWidgets.QWidget):
             
     def plotStockGraph(self):
         firstStock=self.industryData[0]
-        data=ts.get_hist_data(firstStock[0],ktype='5')
-        data=data['close']
-        data=np.array(data)
+        data=self.getClosePrice(firstStock[0])
         self.stockGraph.plot(data)
             
     def setupConnection(self):
         self.searchLineEdit.textChanged.connect(self.searchStockList)
+        self.stockList.itemDoubleClicked.connect(self.stockFocusChanged)
         
     def searchStockList(self):
         searchContent=self.searchLineEdit.text()
@@ -69,4 +68,16 @@ class StockBrowser(QtWidgets.QWidget):
         
     def getMatchRate(self,matchRateList):
         return matchRateList[0]
+    
+    def getClosePrice(self,code):
+        data=ts.get_hist_data(code,ktype='5')
+        return data['close']
+    
+    def stockFocusChanged(self,item):
+        stock=item.text()
+        stock=stock.split('\t')
+        code=stock[0]
+        closePrice=self.getClosePrice(code)
+        self.stockGraph.clear()
+        self.stockGraph.plot(closePrice)
                     
