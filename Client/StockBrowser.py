@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets,QtCore
+from PyQt5 import QtWidgets
 import pyqtgraph as pg
 import tushare as ts
 import numpy as np
@@ -6,6 +6,9 @@ import SearchLineEdit
 
 class StockBrowser(QtWidgets.QWidget):
     
+    industryData=np.loadtxt('industry.txt',str,delimiter=',')
+    
+    #Functions:
     def __init__(self,parent=None):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
@@ -14,7 +17,9 @@ class StockBrowser(QtWidgets.QWidget):
     def initUI(self):
         self.searchLineEdit=SearchLineEdit.SearchLineEdit()
         self.stockList=QtWidgets.QListWidget()
+        self.fillStockList()
         self.stockGraph=pg.PlotWidget()
+        self.plotStockGraph()
         
         self.leftLayout=QtWidgets.QVBoxLayout()
         self.leftLayout.addWidget(self.searchLineEdit)
@@ -28,13 +33,8 @@ class StockBrowser(QtWidgets.QWidget):
         self.mainLayout.addLayout(self.middleLayout)
         self.mainLayout.setStretchFactor(self.leftLayout,3)
         self.mainLayout.setStretchFactor(self.middleLayout,7)
-        
-        self.fillStockList()
-        self.plotStockGraph()
-        
     
     def fillStockList(self):
-        self.industryData=np.loadtxt('industry.txt',str,delimiter=',')
         for stock in self.industryData:
             self.stockList.addItem(stock[0]+'\t'+stock[1]+'\t'+stock[2])
             
@@ -46,15 +46,6 @@ class StockBrowser(QtWidgets.QWidget):
     def setupConnection(self):
         self.searchLineEdit.textChanged.connect(self.searchStockList)
         self.stockList.itemDoubleClicked.connect(self.stockFocusChanged)
-        
-    def searchStockList(self):
-        searchContent=self.searchLineEdit.text()
-        matchRateList=self.matchRate(searchContent)
-        matchRateList.sort(key=self.getMatchRate,reverse=True)
-        self.stockList.clear()
-        for stock in matchRateList:
-            info=stock[1]
-            self.stockList.addItem(info[0]+'\t'+info[1]+'\t'+info[2])
         
     def matchRate(self,searchContent):
         matchRateList=[]
@@ -71,7 +62,19 @@ class StockBrowser(QtWidgets.QWidget):
     
     def getClosePrice(self,code):
         data=ts.get_hist_data(code,ktype='5')
-        return data['close']
+        data=data['close']
+        data=np.array(data)
+        return data[::-1]
+    
+    #Slots:
+    def searchStockList(self):
+        searchContent=self.searchLineEdit.text()
+        matchRateList=self.matchRate(searchContent)
+        matchRateList.sort(key=self.getMatchRate,reverse=True)
+        self.stockList.clear()
+        for stock in matchRateList:
+            info=stock[1]
+            self.stockList.addItem(info[0]+'\t'+info[1]+'\t'+info[2])
     
     def stockFocusChanged(self,item):
         stock=item.text()

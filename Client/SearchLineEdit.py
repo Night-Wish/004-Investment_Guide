@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets,QtGui,QtCore
 
 class SearchLineEdit(QtWidgets.QLineEdit):
     
+    #Functions:
     def __init__(self,parent=None):
         QtWidgets.QLineEdit.__init__(self,parent)
         self.initUI()
@@ -16,7 +17,6 @@ class SearchLineEdit(QtWidgets.QLineEdit):
         self.spacerItem=QtWidgets.QSpacerItem(10,10,QtWidgets.QSizePolicy.Expanding)
         self.mainLayout=QtWidgets.QHBoxLayout(self)
         
-        self.searchBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.mainLayout.addSpacerItem(self.spacerItem)
         self.mainLayout.addWidget(self.searchBtn)
         self.mainLayout.addSpacing(1)
