@@ -12,9 +12,9 @@ class Login(QtWidgets.QWidget):
         
     def initUI(self):
         self.usernameLabel=QtWidgets.QLabel('Username:')
-        self.usernameLineEdit=QtWidgets.QLineEdit(self)
+        self.setupUsernameLineEdit()
         self.passwordLabel=QtWidgets.QLabel('Password:')
-        self.passwordLineEdit=QtWidgets.QLineEdit(self)
+        self.setupPasswordLineEdit()
         self.rememberCheckBox=QtWidgets.QCheckBox('Remember')
         self.autoLogCheckBox=QtWidgets.QCheckBox('Auto Login')
         self.loginPushBtn=QtWidgets.QPushButton('Login')
@@ -22,6 +22,17 @@ class Login(QtWidgets.QWidget):
         self.mainLayout=QtWidgets.QGridLayout(self)
         
         self.setWindowTitle("Login")
+        
+    def setupUsernameLineEdit(self):
+        self.usernameLineEdit=QtWidgets.QLineEdit(self)
+        self.usernameLineEdit.setPlaceholderText('Input your username')
+        self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
+        
+    def setupPasswordLineEdit(self):
+        self.passwordLineEdit=QtWidgets.QLineEdit(self)
+        self.passwordLineEdit.setPlaceholderText('Input your password')
+        self.passwordLineEdit.setEchoMode(self.passwordLineEdit.Password)
+        self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
         
     def arrangeUI(self):
         self.mainLayout.addWidget(self.usernameLabel,0,0)
