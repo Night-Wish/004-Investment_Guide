@@ -1,9 +1,3 @@
-'''
-在Anaconda Prompt中输入pip install pyecharts==0.5.6
-更高级的版本无法使用
-该程序一定会在第二次运行时崩溃，初步诊断为QWebEngineView()的问题
-'''
-
 from PyQt5 import QtWidgets,QtCore
 import pyqtgraph as pg
 import tushare as ts
