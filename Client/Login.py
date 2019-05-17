@@ -1,16 +1,24 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets,QtCore
 
 class Login(QtWidgets.QWidget):
-
+    
+    #Signals:
+    serverFeedback=QtCore.pyqtSignal(str)
+    
     def __init__(self,parent=None):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
+        self.setupConnection()
         
+    #Functions:
     def initUI(self):
         self.usernameLabel=QtWidgets.QLabel('Username:')
         self.usernameLineEdit=QtWidgets.QLineEdit(self)
+        self.usernameLineEdit.setPlaceholderText('Input your username')
         self.passwordLabel=QtWidgets.QLabel('Password:')
         self.passwordLineEdit=QtWidgets.QLineEdit(self)
+        self.passwordLineEdit.setPlaceholderText('Input your password')
+        self.passwordLineEdit.setEchoMode(self.passwordLineEdit.Password)
         self.rememberCheckBox=QtWidgets.QCheckBox('Remember')
         self.autoLogCheckBox=QtWidgets.QCheckBox('Auto Login')
         self.loginPushBtn=QtWidgets.QPushButton('Login')
@@ -23,3 +31,15 @@ class Login(QtWidgets.QWidget):
         self.mainLayout.addWidget(self.rememberCheckBox,2,0)
         self.mainLayout.addWidget(self.autoLogCheckBox,2,1)
         self.mainLayout.addWidget(self.loginPushBtn,2,2)
+        
+        self.setWindowTitle("Login")
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        
+    def setupConnection(self):
+        self.loginPushBtn.clicked.connect(self.loginBtnClicked)
+        self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
+        self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
+        
+    #Slots:
+    def loginBtnClicked(self):
+        self.serverFeedback.emit('1')
