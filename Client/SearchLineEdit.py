@@ -2,11 +2,11 @@ from PyQt5 import QtWidgets,QtGui,QtCore
 
 class SearchLineEdit(QtWidgets.QLineEdit):
     
-    #Functions:
     def __init__(self,parent=None):
         QtWidgets.QLineEdit.__init__(self,parent)
         self.initUI()
-        
+    
+    #Functions:        
     def initUI(self):
         self.buttonSize=19
         self.searchIcon=QtGui.QIcon('SearchIcon.jpg')
