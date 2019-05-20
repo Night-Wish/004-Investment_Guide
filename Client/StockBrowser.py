@@ -1,10 +1,7 @@
-from PyQt5 import QtWidgets,QtCore
+from PyQt5 import QtWidgets,QtCore,QtGui
 import pyqtgraph as pg
 import tushare as ts
 import numpy as np
-import SearchLineEdit
-import datetime
-from CandlestickItem import CandlestickItem
 
 class StockBrowser(QtWidgets.QWidget):
     
@@ -19,7 +16,7 @@ class StockBrowser(QtWidgets.QWidget):
         
     #Functions:
     def initUI(self):
-        self.searchLineEdit=SearchLineEdit.SearchLineEdit()
+        self.searchLineEdit=SearchLineEdit()
         self.stockList=QtWidgets.QListWidget()
         self.fillStockList()
         self.stockKLine=pg.PlotWidget()
@@ -49,7 +46,6 @@ class StockBrowser(QtWidgets.QWidget):
         self.searchLineEdit.textChanged.connect(self.searchStockList)
         self.stockList.itemDoubleClicked.connect(self.stockFocusChanged)
         self.moveSlot=pg.SignalProxy(self.stockKLine.scene().sigMouseMoved,rateLimit=60,slot=self.printSlot)
-        self.testSlot=pg.SignalProxy(self.stockKLine.sigScaleChanged,slot=self.test)
         
     def matchRate(self,searchContent):
         matchRateList=[]
@@ -112,19 +108,64 @@ class StockBrowser(QtWidgets.QWidget):
         self.plotKLine()
         
     def printSlot(self, event=None):
-        pos = event[0]  # 获取事件的鼠标位置
-        # 如果鼠标位置在绘图部件中
+        pos = event[0]
         if self.stockKLine.sceneBoundingRect().contains(pos):
-            mousePoint = self.stockKLine.plotItem.vb.mapSceneToView(pos)  # 转换鼠标坐标
-            index = int(mousePoint.x())  # 鼠标所处的X轴坐标
-            pos_y = int(mousePoint.y())  # 鼠标所处的Y轴坐标
+            mousePoint = self.stockKLine.plotItem.vb.mapSceneToView(pos)
+            index = int(mousePoint.x())
+            pos_y = int(mousePoint.y())
             if -1 < index < len(self.data.index):
-                # 在label中写入HTML
                 self.label.setHtml("<p style='color:white'><strong>Date: {0}</strong></p><p style='color:white'>Open: {1}</p><p style='color:white'>Close: {2}</p><p style='color:white'>High: <span style='color:red;'>{3}</span></p><p style='color:white'>Low: <span style='color:green;'>{4}</span></p>".format(self.axisDict[index], self.data['open'][index], self.data['close'][index],self.data['high'][index], self.data['low'][index]))
-                self.label.setPos(mousePoint.x(), mousePoint.y())  # 设置label的位置
-            # 设置垂直线条和水平线条的位置组成十字光标
+                self.label.setPos(mousePoint.x(), mousePoint.y())
             self.vLine.setPos(mousePoint.x())
             self.hLine.setPos(mousePoint.y())
                     
-    def test(self):
-        print('Test')
+class SearchLineEdit(QtWidgets.QLineEdit):
+    
+    def __init__(self,parent=None):
+        QtWidgets.QLineEdit.__init__(self,parent)
+        self.initUI()
+    
+    #Functions:        
+    def initUI(self):
+        self.buttonSize=19
+        self.searchIcon=QtGui.QIcon('SearchIcon.jpg')
+        self.searchBtn=QtWidgets.QPushButton(self)
+        self.searchBtn.setIcon(self.searchIcon)
+        self.searchBtn.setMaximumSize(self.buttonSize,self.buttonSize)
+        self.searchBtn.setMinimumSize(self.buttonSize,self.buttonSize)
+        self.spacerItem=QtWidgets.QSpacerItem(10,10,QtWidgets.QSizePolicy.Expanding)
+        self.mainLayout=QtWidgets.QHBoxLayout(self)
+        
+        self.mainLayout.addSpacerItem(self.spacerItem)
+        self.mainLayout.addWidget(self.searchBtn)
+        self.mainLayout.addSpacing(1)
+        self.mainLayout.setContentsMargins(0,0,0,0)
+        
+        
+        
+class CandlestickItem(pg.GraphicsObject):
+    
+    def __init__(self,data):
+        pg.GraphicsObject.__init__(self)
+        self.data=data
+        self.generatePicture()
+        
+    def generatePicture(self):
+        self.picture=QtGui.QPicture()
+        painter=QtGui.QPainter(self.picture)
+        painter.setPen(pg.mkPen('w'))
+        width=(self.data[1][0]-self.data[0][0])/3
+        for (t,open,close,min,max) in self.data:
+            painter.drawLine(QtCore.QPointF(t,min),QtCore.QPointF(t,max))
+            if open>close:
+                painter.setBrush(pg.mkBrush('g'))
+            else:
+                painter.setBrush(pg.mkBrush('r'))
+            painter.drawRect(QtCore.QRectF(t-width,open,width*2,close-open))
+        painter.end()
+        
+    def paint(self,painter, *args):
+        painter.drawPicture(0,0,self.picture)
+        
+    def boundingRect(self):
+        return QtCore.QRectF(self.picture.boundingRect())

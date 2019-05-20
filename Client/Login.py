@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets,QtCore
+from PyQt5 import QtWidgets,QtCore,QtNetwork
 
 class Login(QtWidgets.QWidget):
     
@@ -8,6 +8,8 @@ class Login(QtWidgets.QWidget):
     def __init__(self,parent=None):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
+        self.setupSocket()
+        self.setupLoginSettings()
         self.setupConnection()
         
     #Functions:
@@ -35,11 +37,50 @@ class Login(QtWidgets.QWidget):
         self.setWindowTitle("Login")
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
+    def setupLoginSettings(self):
+        file=QtCore.QFile('remember.dat')
+        if not file.open(QtCore.QIODevice.Text and QtCore.QIODevice.ReadOnly):
+            return
+        textStream=QtCore.QTextStream(file)
+        username=textStream.readLine()
+        if username=='':
+            return
+        else:
+            self.usernameLineEdit.setText(username)
+            self.rememberCheckBox.setChecked(True)
+            password=textStream.readLine()
+            if password=='':
+                return
+            else:
+                self.passwordLineEdit.setText(password)
+                self.autoLogCheckBox.setChecked(True)
+                self.loginBtnClicked()
+        file.close()
+        
     def setupConnection(self):
         self.loginPushBtn.clicked.connect(self.loginBtnClicked)
         self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
         self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
         
+    def setupSocket(self):
+        self.loginSocket=QtNetwork.QUdpSocket(self)
+        
+    def saveLoginSettings(self):
+        file=QtCore.QFile('remember.dat')
+        if not file.open(QtCore.QIODevice.Text and QtCore.QIODevice.WriteOnly):
+            print(1)
+            return
+        textStream=QtCore.QTextStream(file)
+        if self.rememberCheckBox.isChecked():
+            textStream<<self.usernameLineEdit.text()
+        if self.autoLogCheckBox.isChecked():
+            textStream<<'\n'<<self.passwordLineEdit.text()
+        file.close()
+        
     #Slots:
     def loginBtnClicked(self):
-        self.serverFeedback.emit('1')
+        self.saveLoginSettings()
+        msg='0:'+self.usernameLineEdit.text()+' '+self.passwordLineEdit.text()
+        msg=msg.encode()
+        self.loginSocket.writeDatagram(msg,QtNetwork.QHostAddress.LocalHost,9999)
+        
