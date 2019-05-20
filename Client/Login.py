@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets,QtCore
+from PyQt5 import QtWidgets,QtCore,QtNetwork
 
 class Login(QtWidgets.QWidget):
     
@@ -8,6 +8,7 @@ class Login(QtWidgets.QWidget):
     def __init__(self,parent=None):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
+        self.setupSocket()
         self.setupConnection()
         
     #Functions:
@@ -40,6 +41,14 @@ class Login(QtWidgets.QWidget):
         self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
         self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
         
+    def setupSocket(self):
+        self.loginSocket=QtNetwork.QUdpSocket(self)
+        
+        
     #Slots:
     def loginBtnClicked(self):
-        self.serverFeedback.emit('1')
+        msg=self.usernameLineEdit.text()+' '+self.passwordLineEdit.text()
+        msg=msg.encode()
+        self.loginSocket.writeDatagram(msg,QtNetwork.QHostAddress.LocalHost,9999)
+                           
+        
