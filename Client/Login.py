@@ -1,4 +1,5 @@
-from PyQt5 import QtWidgets,QtCore,QtNetwork
+from PyQt5 import QtWidgets,QtCore
+import socket
 
 class Login(QtWidgets.QWidget):
     
@@ -63,7 +64,7 @@ class Login(QtWidgets.QWidget):
         self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
         
     def setupSocket(self):
-        self.loginSocket=QtNetwork.QUdpSocket(self)
+        self.loginSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         
     def saveLoginSettings(self):
         file=QtCore.QFile('remember.dat')
@@ -80,7 +81,19 @@ class Login(QtWidgets.QWidget):
     #Slots:
     def loginBtnClicked(self):
         self.saveLoginSettings()
-        msg='0:'+self.usernameLineEdit.text()+' '+self.passwordLineEdit.text()
-        msg=msg.encode()
-        self.loginSocket.writeDatagram(msg,QtNetwork.QHostAddress.LocalHost,9999)
+        if self.usernameLineEdit.text().isalnum() and self.passwordLineEdit.text().isalnum():
+            msg=self.usernameLineEdit.text()+' '+self.passwordLineEdit.text()
+            msg=msg.encode()
+            self.loginSocket.sendto(msg,('127.0.0.1',9999))
+            resultChecked=self.loginSocket.recv(1024).decode()
+            if resultChecked=='1':
+                QtWidgets.QMessageBox.information(self,'Error message','The password is wrong.')
+            elif resultChecked=='3':
+                QtWidgets.QMessageBox.information(self,'Error message','There is no such username.')
+            elif resultChecked=='2':
+                print('登陆成功')   #将此行替换为转换到股票界面
+            else:
+                QtWidgets.QMessageBox.information(self,'Error message','Can not bulit connection right now.') 
+        else:
+            QtWidgets.QMessageBox.information(self,'Error message','The username and password can only contain numbers and letters.')
         
