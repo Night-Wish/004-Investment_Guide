@@ -8,11 +8,11 @@ class Server():
     def setupSocket(self):
         self.serverSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.serverSocket.bind(('127.0.0.1',9999))
-        print('Start to bind UDP on 9999. ')
+        print('Binding socket to port 9999')
         while True:
             self.dataRecv,self.addr=self.serverSocket.recvfrom(1024)
             print('Received from %s:%s.'%self.addr)
-            print('Received massage: ',self.dataRecv.decode())
+            print('Received message:',self.dataRecv.decode())
             self.openFile(1)
     
     def openFile(self, mode):
