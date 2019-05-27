@@ -111,7 +111,8 @@ class StockBrowser(QtWidgets.QWidget):
         pos = event[0]
         if self.stockKLine.sceneBoundingRect().contains(pos):
             mousePoint = self.stockKLine.plotItem.vb.mapSceneToView(pos)
-            index = int(mousePoint.x())
+            index = float(mousePoint.x())
+            index=round(index)
             pos_y = int(mousePoint.y())
             if -1 < index < len(self.data.index):
                 self.label.setHtml("<p style='color:white'><strong>Date: {0}</strong></p><p style='color:white'>Open: {1}</p><p style='color:white'>Close: {2}</p><p style='color:white'>High: <span style='color:red;'>{3}</span></p><p style='color:white'>Low: <span style='color:green;'>{4}</span></p>".format(self.axisDict[index], self.data['open'][index], self.data['close'][index],self.data['high'][index], self.data['low'][index]))
