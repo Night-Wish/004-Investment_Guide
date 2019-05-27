@@ -10,8 +10,8 @@ class Login(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
         self.setupSocket()
-        self.setupLoginSettings()
         self.setupConnection()
+        self.setupLoginSettings()
         
     #Functions:
     def initUI(self):
@@ -38,6 +38,16 @@ class Login(QtWidgets.QWidget):
         self.setWindowTitle("Login")
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
+    def setupConnection(self):
+        self.loginPushBtn.clicked.connect(self.loginBtnClicked)
+        self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
+        self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
+        self.rememberCheckBox.stateChanged.connect(self.rememberStateChanged)
+        self.autoLogCheckBox.stateChanged.connect(self.autologStateChanged)
+        
+    def setupSocket(self):
+        self.loginSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        
     def setupLoginSettings(self):
         file=QtCore.QFile('remember.dat')
         if not file.open(QtCore.QIODevice.Text and QtCore.QIODevice.ReadOnly):
@@ -57,14 +67,6 @@ class Login(QtWidgets.QWidget):
                 self.autoLogCheckBox.setChecked(True)
                 self.loginBtnClicked()
         file.close()
-        
-    def setupConnection(self):
-        self.loginPushBtn.clicked.connect(self.loginBtnClicked)
-        self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
-        self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
-        
-    def setupSocket(self):
-        self.loginSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         
     def saveLoginSettings(self):
         file=QtCore.QFile('remember.dat')
@@ -97,4 +99,15 @@ class Login(QtWidgets.QWidget):
                 QtWidgets.QMessageBox.information(self,'Error message','Can not build connection right now.') 
         else:
             QtWidgets.QMessageBox.information(self,'Error message','The username and password can only contain numbers and letters.')
+    
+    def rememberStateChanged(self):
+        if self.rememberCheckBox.isChecked():
+            pass
+        else:
+            self.autoLogCheckBox.setChecked(False)
         
+    def autologStateChanged(self):
+        if self.autoLogCheckBox.isChecked():
+            self.rememberCheckBox.setChecked(True)
+
+    
