@@ -11,7 +11,6 @@ class Login(QtWidgets.QWidget):
         self.initUI()
         self.setupSocket()
         self.setupConnection()
-        self.setupLoginSettings()
         
     #Functions:
     def initUI(self):

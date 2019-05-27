@@ -19,9 +19,11 @@ class MainWindow(QtWidgets.QMainWindow):
         
     def setupConnection(self):
         self.login.serverFeedback.connect(self.feedbackReceived)
+        self.login.setupLoginSettings()
     
     #Slots:
     def feedbackReceived(self,feedback):
+        print('Feedback Received...')
         if feedback == '1':
             self.stockBrowser=StockBrowser.StockBrowser()
             self.login.close()
