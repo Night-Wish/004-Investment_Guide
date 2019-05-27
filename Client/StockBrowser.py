@@ -118,6 +118,7 @@ class StockBrowser(QtWidgets.QWidget):
                 self.label.setPos(mousePoint.x(), mousePoint.y())
             self.vLine.setPos(mousePoint.x())
             self.hLine.setPos(mousePoint.y())
+            
                     
 class SearchLineEdit(QtWidgets.QLineEdit):
     
@@ -140,7 +141,6 @@ class SearchLineEdit(QtWidgets.QLineEdit):
         self.mainLayout.addWidget(self.searchBtn)
         self.mainLayout.addSpacing(1)
         self.mainLayout.setContentsMargins(0,0,0,0)
-        
         
         
 class CandlestickItem(pg.GraphicsObject):

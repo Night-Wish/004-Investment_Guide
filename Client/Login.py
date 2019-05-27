@@ -93,7 +93,7 @@ class Login(QtWidgets.QWidget):
             elif resultChecked=='2':
                 print('登陆成功')   #将此行替换为转换到股票界面
             else:
-                QtWidgets.QMessageBox.information(self,'Error message','Can not bulit connection right now.') 
+                QtWidgets.QMessageBox.information(self,'Error message','Can not build connection right now.') 
         else:
             QtWidgets.QMessageBox.information(self,'Error message','The username and password can only contain numbers and letters.')
         
