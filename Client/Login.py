@@ -93,7 +93,6 @@ class Login(QtWidgets.QWidget):
                 QtWidgets.QMessageBox.information(self,'Error message','There is no such username.')
             elif resultChecked=='2':
                 self.serverFeedback.emit('1')
-                print('登陆成功')   #将此行替换为转换到股票界面
             else:
                 QtWidgets.QMessageBox.information(self,'Error message','Can not build connection right now.') 
         else:

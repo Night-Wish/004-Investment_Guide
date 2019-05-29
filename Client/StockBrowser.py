@@ -3,6 +3,9 @@ import pyqtgraph as pg
 import tushare as ts
 import numpy as np
 
+import ChooseStock
+import StockChoose_hist_data
+
 class StockBrowser(QtWidgets.QWidget):
     
     industryData=np.loadtxt('industry.txt',str,delimiter=',')
@@ -21,13 +24,17 @@ class StockBrowser(QtWidgets.QWidget):
         self.fillStockList()
         self.stockKLine=pg.PlotWidget()
         self.plotKLine()
+        self.analyseBtn=QtWidgets.QPushButton('Analyse')
+        self.analyseText=QtWidgets.QTextEdit()
         
         self.leftLayout=QtWidgets.QVBoxLayout()
         self.leftLayout.addWidget(self.searchLineEdit)
         self.leftLayout.addWidget(self.stockList)
         
         self.middleLayout=QtWidgets.QVBoxLayout()
+        self.middleLayout.addWidget(self.analyseBtn)
         self.middleLayout.addWidget(self.stockKLine)
+        self.middleLayout.addWidget(self.analyseText)
         
         self.mainLayout=QtWidgets.QHBoxLayout(self)
         self.mainLayout.addLayout(self.leftLayout)
@@ -46,7 +53,24 @@ class StockBrowser(QtWidgets.QWidget):
         self.searchLineEdit.textChanged.connect(self.searchStockList)
         self.stockList.itemDoubleClicked.connect(self.stockFocusChanged)
         self.moveSlot=pg.SignalProxy(self.stockKLine.scene().sigMouseMoved,rateLimit=60,slot=self.printSlot)
+        self.analyseBtn.clicked.connect(self.recommend)
         
+    def recommend(self):
+        self.codeRec,self.codeLimUp=ChooseStock.recommend()
+        tempTotal=self.stockList.count()
+        for i in range(tempTotal):
+            tempText=self.stockList.item(i).text()
+            tempNum=tempText[0:6]
+            for j in self.codeRec:
+                if tempNum==j:
+                    self.stockList.item(i).setBackground(QtGui.QColor('deepskyblue'))
+                    break
+            for j in self.codeLimUp:
+                if tempNum==j:
+                    self.stockList.item(i).setBackground(QtGui.QColor('tomato'))
+                    break
+        print('analyse over')
+    
     def matchRate(self,searchContent):
         matchRateList=[]
         for stock in self.industryData:
@@ -105,7 +129,12 @@ class StockBrowser(QtWidgets.QWidget):
         stock=stock.split('\t')
         self.code=stock[0]
         self.updateStockData()
+        self.updateStockText()
         self.plotKLine()
+        
+    def updateStockText(self):
+        self.stockPreText=StockChoose_hist_data.parse(self.code)
+        self.analyseText.setPlainText(self.stockPreText)
         
     def printSlot(self, event=None):
         pos = event[0]
