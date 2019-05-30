@@ -7,13 +7,16 @@ class Login(QtWidgets.QWidget):
     serverFeedback=QtCore.pyqtSignal(str)
     
     def __init__(self,parent=None):
+        print('Initializing Login...')
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
         self.setupSocket()
         self.setupConnection()
+        print('Initialized Login')
         
     #Functions:
     def initUI(self):
+        print('Initializing Login UI...')
         self.usernameLabel=QtWidgets.QLabel('Username:')
         self.usernameLineEdit=QtWidgets.QLineEdit(self)
         self.usernameLineEdit.setPlaceholderText('Input your username')
@@ -36,18 +39,24 @@ class Login(QtWidgets.QWidget):
         
         self.setWindowTitle("Login")
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        print('Initialized Login UI')
         
     def setupConnection(self):
+        print('Setting up connections...')
         self.loginPushBtn.clicked.connect(self.loginBtnClicked)
         self.usernameLineEdit.returnPressed.connect(self.loginBtnClicked)
         self.passwordLineEdit.returnPressed.connect(self.loginBtnClicked)
         self.rememberCheckBox.stateChanged.connect(self.rememberStateChanged)
         self.autoLogCheckBox.stateChanged.connect(self.autologStateChanged)
+        print('Set up connections')
         
     def setupSocket(self):
+        print('Setting up socket...')
         self.loginSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        print('Set up socket')
         
     def setupLoginSettings(self):
+        print('Loading login settings...')
         file=QtCore.QFile('remember.dat')
         if not file.open(QtCore.QIODevice.Text and QtCore.QIODevice.ReadOnly):
             return
@@ -68,6 +77,7 @@ class Login(QtWidgets.QWidget):
         file.close()
         
     def saveLoginSettings(self):
+        print('Saving login settings...')
         file=QtCore.QFile('remember.dat')
         if not file.open(QtCore.QIODevice.Text and QtCore.QIODevice.WriteOnly):
             print(1)
@@ -81,6 +91,7 @@ class Login(QtWidgets.QWidget):
         
     #Slots:
     def loginBtnClicked(self):
+        print('Login button clicked...')
         self.saveLoginSettings()
         if self.usernameLineEdit.text().isalnum() and self.passwordLineEdit.text().isalnum():
             msg=self.usernameLineEdit.text()+' '+self.passwordLineEdit.text()
@@ -99,12 +110,14 @@ class Login(QtWidgets.QWidget):
             QtWidgets.QMessageBox.information(self,'Error message','The username and password can only contain numbers and letters.')
     
     def rememberStateChanged(self):
+        print('Remember state changed...')
         if self.rememberCheckBox.isChecked():
             pass
         else:
             self.autoLogCheckBox.setChecked(False)
         
     def autologStateChanged(self):
+        print('Autolog state changed...')
         if self.autoLogCheckBox.isChecked():
             self.rememberCheckBox.setChecked(True)
 

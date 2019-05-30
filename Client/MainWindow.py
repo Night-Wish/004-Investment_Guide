@@ -5,22 +5,27 @@ from PyQt5 import QtWidgets,QtGui
 class MainWindow(QtWidgets.QMainWindow):
     
     def __init__(self,parent=None):
+        print('Initializing mainwindow')
         QtWidgets.QMainWindow.__init__(self,parent)
         self.initUI()
         self.setupConnection()
+        self.login.setupLoginSettings()
+        print('Initialized mainwindow')
         
     #Functions:
     def initUI(self):
+        print('Initializing the UI of mainwindow...')
         self.login=Login.Login()
         self.setCentralWidget(self.login)
         self.icon=QtGui.QIcon('loginIcon(Temporary).jpg')
         self.setWindowIcon(self.icon)
         self.setWindowTitle('Login')
+        print('Initialized the UI of mainwindow')
         
     def setupConnection(self):
+        print('Setting up connections...')
         self.login.serverFeedback.connect(self.feedbackReceived)
-        self.login.setupLoginSettings()
-    
+        print('Setup connections')
     #Slots:
     def feedbackReceived(self,feedback):
         print('Feedback Received...')
