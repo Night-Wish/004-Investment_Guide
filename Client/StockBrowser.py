@@ -3,6 +3,9 @@ import pyqtgraph as pg
 import tushare as ts
 import numpy as np
 
+import ChooseStock
+import StockChoose_hist_data
+
 class StockBrowser(QtWidgets.QWidget):
     
     industryData=np.loadtxt('industry.txt',str,delimiter=',')
@@ -10,43 +13,74 @@ class StockBrowser(QtWidgets.QWidget):
     data=ts.get_hist_data(code=code).sort_index()
 
     def __init__(self,parent=None):
+        print('Initializing stockbrowser...')
         QtWidgets.QWidget.__init__(self,parent)
         self.initUI()
         self.setupConnection()
+        print('Initialized stockbrowser')
         
     #Functions:
     def initUI(self):
+        print('Initializing stockbrowser UI...')
         self.searchLineEdit=SearchLineEdit()
         self.stockList=QtWidgets.QListWidget()
         self.fillStockList()
         self.stockKLine=pg.PlotWidget()
         self.plotKLine()
+        self.analyseBtn=QtWidgets.QPushButton('Analyse')
+        self.analyseText=QtWidgets.QTextEdit()
         
         self.leftLayout=QtWidgets.QVBoxLayout()
         self.leftLayout.addWidget(self.searchLineEdit)
         self.leftLayout.addWidget(self.stockList)
         
         self.middleLayout=QtWidgets.QVBoxLayout()
+        self.middleLayout.addWidget(self.analyseBtn)
         self.middleLayout.addWidget(self.stockKLine)
+        self.middleLayout.addWidget(self.analyseText)
         
         self.mainLayout=QtWidgets.QHBoxLayout(self)
         self.mainLayout.addLayout(self.leftLayout)
         self.mainLayout.addLayout(self.middleLayout)
         self.mainLayout.setStretchFactor(self.leftLayout,3)
         self.mainLayout.setStretchFactor(self.middleLayout,7)
-    
+        print('Initialized stockbrowser UI')
+        
     def fillStockList(self):
+        print('Filling stock list...')
         for stock in self.industryData:
             self.stockList.addItem(stock[0]+'\t'+stock[1]+'\t'+stock[2])
-            
+        print('Filled stock list')
+        
     def updateStockData(self):
+        print('Updating stock data...')
         self.data=ts.get_hist_data(self.code).sort_index()
-            
+        print('Updated stock data')
+        
     def setupConnection(self):
+        print('Setting up connections...')
         self.searchLineEdit.textChanged.connect(self.searchStockList)
         self.stockList.itemDoubleClicked.connect(self.stockFocusChanged)
         self.moveSlot=pg.SignalProxy(self.stockKLine.scene().sigMouseMoved,rateLimit=60,slot=self.printSlot)
+        self.analyseBtn.clicked.connect(self.recommend)
+        print('Set up connections')
         
+    def recommend(self):
+        self.codeRec,self.codeLimUp=ChooseStock.recommend()
+        tempTotal=self.stockList.count()
+        for i in range(tempTotal):
+            tempText=self.stockList.item(i).text()
+            tempNum=tempText[0:6]
+            for j in self.codeRec:
+                if tempNum==j:
+                    self.stockList.item(i).setBackground(QtGui.QColor('deepskyblue'))
+                    break
+            for j in self.codeLimUp:
+                if tempNum==j:
+                    self.stockList.item(i).setBackground(QtGui.QColor('tomato'))
+                    break
+        print('analyse over')
+    
     def matchRate(self,searchContent):
         matchRateList=[]
         for stock in self.industryData:
@@ -61,6 +95,7 @@ class StockBrowser(QtWidgets.QWidget):
         return matchRateList[0]
     
     def plotKLine(self):
+        print('Plotting K line...')
         yMin=self.data['low'].min()
         yMax=self.data['high'].max()
         xMax=len(self.data['open'])
@@ -89,7 +124,8 @@ class StockBrowser(QtWidgets.QWidget):
         self.hLine = pg.InfiniteLine(angle=0,movable=False)
         self.stockKLine.addItem(self.vLine)
         self.stockKLine.addItem(self.hLine)
-    
+        print('Plotted K line')
+        
     #Slots:
     def searchStockList(self):
         searchContent=self.searchLineEdit.text()
@@ -101,23 +137,31 @@ class StockBrowser(QtWidgets.QWidget):
             self.stockList.addItem(info[0]+'\t'+info[1]+'\t'+info[2])
     
     def stockFocusChanged(self,item):
+        print('Stock focus changed...')
         stock=item.text()
         stock=stock.split('\t')
         self.code=stock[0]
         self.updateStockData()
+        self.updateStockText()
         self.plotKLine()
+        
+    def updateStockText(self):
+        self.stockPreText=StockChoose_hist_data.parse(self.code)
+        self.analyseText.setPlainText(self.stockPreText)
         
     def printSlot(self, event=None):
         pos = event[0]
         if self.stockKLine.sceneBoundingRect().contains(pos):
             mousePoint = self.stockKLine.plotItem.vb.mapSceneToView(pos)
-            index = int(mousePoint.x())
+            index = float(mousePoint.x())
+            index=round(index)
             pos_y = int(mousePoint.y())
             if -1 < index < len(self.data.index):
                 self.label.setHtml("<p style='color:white'><strong>Date: {0}</strong></p><p style='color:white'>Open: {1}</p><p style='color:white'>Close: {2}</p><p style='color:white'>High: <span style='color:red;'>{3}</span></p><p style='color:white'>Low: <span style='color:green;'>{4}</span></p>".format(self.axisDict[index], self.data['open'][index], self.data['close'][index],self.data['high'][index], self.data['low'][index]))
                 self.label.setPos(mousePoint.x(), mousePoint.y())
             self.vLine.setPos(mousePoint.x())
             self.hLine.setPos(mousePoint.y())
+            
                     
 class SearchLineEdit(QtWidgets.QLineEdit):
     
@@ -140,7 +184,6 @@ class SearchLineEdit(QtWidgets.QLineEdit):
         self.mainLayout.addWidget(self.searchBtn)
         self.mainLayout.addSpacing(1)
         self.mainLayout.setContentsMargins(0,0,0,0)
-        
         
         
 class CandlestickItem(pg.GraphicsObject):

@@ -1,9 +1,6 @@
-import sys
 import Server
-from PyQt5 import QtWidgets
 
 if __name__=='__main__':
-    app=QtWidgets.QApplication(sys.argv)
+    print('Building Server...')
     server=Server.Server()
-    server.show()
-    sys.exit(app.exec())
+    print('Built Server')
